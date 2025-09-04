@@ -42,6 +42,16 @@ const data = {
       url: '/admin/clients',
       icon: IconListDetails
     },
+    {
+      title: 'Customers',
+      url: '/admin/customers',
+      icon: IconListDetails
+    },
+    {
+      title: 'Tickets',
+      url: '/admin/tickets',
+      icon: IconListDetails
+    },
 
     {
       title: 'Team',
