@@ -78,11 +78,13 @@ export const verification = pgTable('verification', {
 export const customers = pgTable('customers', {
   id: text('id')
     .primaryKey()
-    .notNull()
     .default(sql`gen_random_uuid()`),
-  firstName: varchar('first_name').notNull(),
-  lastName: varchar('last_name').notNull(),
-  email: varchar('email').unique().notNull(),
+  email: text('email').notNull().unique(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'restrict' }),
   phone: varchar('phone').unique().notNull(),
   address1: varchar('address1').notNull(),
   address2: varchar('address2'),
@@ -91,12 +93,11 @@ export const customers = pgTable('customers', {
   zip: varchar('zip', { length: 10 }).notNull(),
   notes: text('notes'),
   active: boolean('active').notNull().default(true),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date())
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow()
 })
+
+export type Customer = typeof customers.$inferSelect
 
 export const tickets = pgTable('tickets', {
   id: text('id')
@@ -116,6 +117,8 @@ export const tickets = pgTable('tickets', {
     .defaultNow()
     .$onUpdate(() => new Date())
 })
+
+export type Ticket = typeof tickets.$inferSelect
 
 // Create relations
 export const customersRelations = relations(customers, ({ many }) => ({

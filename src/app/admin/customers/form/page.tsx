@@ -32,7 +32,7 @@ export default async function CustomerFormPage({
             />
           </>
         )
-      console.log(customer)
+
       // put customer form component
     } else {
       // new customer form component

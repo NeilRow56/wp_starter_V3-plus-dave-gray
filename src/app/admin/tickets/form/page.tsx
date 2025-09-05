@@ -53,7 +53,6 @@ export default async function TicketFormPage({
       }
 
       // return ticket form
-      console.log(customer)
     }
 
     // Edit ticket form
@@ -71,9 +70,9 @@ export default async function TicketFormPage({
 
       const customer = await getCustomer(ticket.customerId)
 
+      console.log(customer)
+
       // return ticket form
-      console.log('ticket: ', ticket)
-      console.log('customer: ', customer)
     }
   } catch (error) {
     if (error instanceof Error) {
