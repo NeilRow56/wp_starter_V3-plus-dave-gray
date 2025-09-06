@@ -10,6 +10,10 @@ export const customerSchema = z.object({
     .min(1, { error: 'Last name is required' })
     .max(20, { error: 'Last name must be at most 20 characters!' }),
   email: z.email('Invalid email address'),
+  userId: z
+    .string()
+    .min(1, { error: 'First name is required' })
+    .max(20, { error: 'First name must be at most 20 characters!' }),
   phone: z
     .string()
     .regex(
@@ -31,5 +35,6 @@ export const customerSchema = z.object({
       /^\d{5}(-\d{4})?$/,
       'Invalid Zip code. Use 5 digits or 5 digits followed by a hyphen and 4 digits'
     ),
-  notes: z.string().optional()
+  notes: z.string().optional(),
+  active: z.boolean()
 })
