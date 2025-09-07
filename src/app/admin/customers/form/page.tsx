@@ -38,6 +38,7 @@ export default async function CustomerTwoFormPage({
     }
 
     // New customer form
+
     if (userId) {
       const user = await getCustomerUser(userId)
 
@@ -66,11 +67,13 @@ export default async function CustomerTwoFormPage({
       //   }
 
       // return customer form
-      console.log(user)
-      return <CustomerForm user={user} />
+      if (userId && !customerId) {
+        return <CustomerForm user={user} />
+      }
     }
 
     // Edit customer form
+
     if (customerId) {
       const customer = await getCustomerTwo(customerId)
 
@@ -87,9 +90,23 @@ export default async function CustomerTwoFormPage({
 
       const user = await getCustomerUser(customer.userId)
 
+      if (userId !== customer.userId) {
+        return (
+          <>
+            <h2 className='mb-2 text-2xl'>
+              Customer-user ID and current-session-user ID do not match
+            </h2>
+            <BackButton
+              title='Go Back'
+              variant='default'
+              className='w-[100px]'
+            />
+          </>
+        )
+      }
+
       // return customer form
-      console.log('customer: ', customer)
-      console.log('user: ', user)
+
       return <CustomerForm customer={customer} user={user} />
     }
   } catch (error) {

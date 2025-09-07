@@ -76,6 +76,7 @@ export default function CustomerForm({ user, customer }: CustomerFormProps) {
                   </FormItem>
                 )}
               />
+
               <InputWithLabel<insertCustomerSchema>
                 fieldTitle='First Name'
                 nameInSchema='firstName'
