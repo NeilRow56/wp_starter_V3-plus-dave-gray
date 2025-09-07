@@ -4,6 +4,9 @@ import * as Sentry from '@sentry/nextjs'
 import { getCustomerUser } from '@/server/users'
 import { getCustomerTwo } from '@/server/customers'
 import CustomerForm from './customer-form'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 export default async function CustomerTwoFormPage({
   searchParams
@@ -11,7 +14,17 @@ export default async function CustomerTwoFormPage({
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
   try {
-    const { userId, customerId } = await searchParams
+    const { customerId } = await searchParams
+
+    const session = await auth.api.getSession({
+      headers: await headers()
+    })
+
+    if (!session) {
+      redirect('/auth/sign-in')
+    }
+
+    const userId = session.session.userId
 
     if (!userId && !customerId) {
       return (
