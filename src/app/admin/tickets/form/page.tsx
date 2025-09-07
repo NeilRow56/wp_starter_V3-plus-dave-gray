@@ -4,6 +4,10 @@ import { getTicket } from '@/server/tickets'
 import * as Sentry from '@sentry/nextjs'
 import TicketForm from './ticket-form'
 
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
+
 export default async function TicketFormPage({
   searchParams
 }: {
@@ -22,6 +26,16 @@ export default async function TicketFormPage({
         </>
       )
     }
+
+    const session = await auth.api.getSession({
+      headers: await headers()
+    })
+
+    if (!session) {
+      redirect('/auth/sign-in')
+    }
+
+    const userId = session.session.userId
 
     // New ticket form
     if (customerId) {
@@ -54,6 +68,22 @@ export default async function TicketFormPage({
       }
 
       // return ticket form
+      // const user = await getCustomerUser(customer.userId)
+
+      if (userId !== customer.userId) {
+        return (
+          <>
+            <h2 className='mb-2 text-2xl'>
+              Customer-user ID and current-session-user ID do not match
+            </h2>
+            <BackButton
+              title='Go Back'
+              variant='default'
+              className='w-[100px]'
+            />
+          </>
+        )
+      }
       console.log(customer)
       return <TicketForm customer={customer} />
     }

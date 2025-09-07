@@ -35,9 +35,10 @@ export function CheckboxWithLabel<S>({
             {fieldTitle}
           </FormLabel>
 
-          <div className='flex items-center gap-2'>
+          <div className='mt-2 flex items-center gap-2'>
             <FormControl>
               <Checkbox
+                className='items-center'
                 id={nameInSchema}
                 {...field}
                 checked={field.value}
