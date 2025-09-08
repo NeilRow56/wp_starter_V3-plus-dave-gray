@@ -8,6 +8,15 @@ const authClient = createAuthClient({
   plugins: [inferAdditionalFields<typeof auth>(), adminClient({ ac, roles })]
 })
 
+// You can also check multiple resource permissions at the same time
+export const canCreateProject = await authClient.admin.hasPermission({
+  permissions: {
+    project: ['create']
+    // sale: ["create"]
+  },
+  role: 'manager'
+})
+
 export const {
   signIn,
   signUp,

@@ -15,6 +15,8 @@ import { SelectWithLabel } from '@/components/form/select-with-label'
 import { StatesArray } from '@/constants/states-array'
 
 import { Input } from '@/components/ui/input'
+import { CheckboxWithLabel } from '@/components/form/checkbox-with-label'
+import { useState } from 'react'
 
 interface CustomerFormProps {
   user: User // You must have a user to start a customer - so it is not optional
@@ -24,6 +26,7 @@ interface CustomerFormProps {
 type insertCustomerSchema = z.infer<typeof customerSchema>
 
 export default function CustomerForm({ user, customer }: CustomerFormProps) {
+  const [isLoading] = useState(false)
   const defaultValues: insertCustomerSchema = {
     firstName: customer?.firstName ?? '',
     lastName: customer?.lastName ?? '',
@@ -54,9 +57,8 @@ export default function CustomerForm({ user, customer }: CustomerFormProps) {
       <div className='flex flex-col gap-1 sm:px-8'>
         <div className='items-center justify-center'>
           <h2 className='text-2xl font-bold lg:text-3xl'>
-            {customer?.id
-              ? `Edit Customer # ${customer.id}`
-              : 'New Customer Form'}
+            {customer?.id ? 'Edit' : 'New'} Customer{' '}
+            {customer?.id ? `#${customer.id}` : 'Form'}
           </h2>
         </div>
         <Form {...form}>
@@ -130,6 +132,16 @@ export default function CustomerForm({ user, customer }: CustomerFormProps) {
                 nameInSchema='notes'
                 className='h-40 p-0'
               />
+
+              {isLoading ? (
+                <p>Loading...</p>
+              ) : customer?.id ? (
+                <CheckboxWithLabel<insertCustomerSchema>
+                  fieldTitle='Active'
+                  nameInSchema='active'
+                  message='Yes'
+                />
+              ) : null}
 
               <div className='flex max-w-md justify-between'>
                 <Button

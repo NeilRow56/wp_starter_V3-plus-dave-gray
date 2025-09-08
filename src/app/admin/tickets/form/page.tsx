@@ -107,7 +107,7 @@ export default async function TicketFormPage({
           </>
         )
       }
-      console.log(customer)
+
       return <TicketForm customer={customer} />
     }
 
@@ -127,8 +127,7 @@ export default async function TicketFormPage({
       const customer = await getCustomer(ticket.customerId)
 
       // return ticket form
-      console.log('ticket: ', ticket)
-      console.log('customer: ', customer)
+
       return <TicketForm customer={customer} ticket={ticket} />
     }
   } catch (error) {
