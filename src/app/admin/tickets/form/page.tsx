@@ -8,6 +8,29 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+export async function generateMetadata({
+  searchParams
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>
+}) {
+  const { customerId, ticketId } = await searchParams
+
+  if (!customerId && !ticketId)
+    return {
+      title: 'Missing Ticket ID or Customer ID'
+    }
+
+  if (customerId)
+    return {
+      title: `New Ticket for Customer #${customerId}`
+    }
+
+  if (ticketId)
+    return {
+      title: `Edit Ticket #${ticketId}`
+    }
+}
+
 export default async function TicketFormPage({
   searchParams
 }: {

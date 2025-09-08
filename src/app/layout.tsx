@@ -22,7 +22,8 @@ export const metadata: Metadata = {
     template: `%s | WpAccPac`,
     default: APP_NAME
   },
-  description: APP_DESCRIPTION
+  description: APP_DESCRIPTION,
+  applicationName: 'WpAccPac'
   // metadataBase: new URL(SERVER_URL)
 }
 

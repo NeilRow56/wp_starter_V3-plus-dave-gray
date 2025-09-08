@@ -8,6 +8,18 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+export async function generateMetadata({
+  searchParams
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>
+}) {
+  const { customerId } = await searchParams
+
+  if (!customerId) return { title: 'New Customer' }
+
+  return { title: `Edit Customer #${customerId}` }
+}
+
 export default async function CustomerTwoFormPage({
   searchParams
 }: {

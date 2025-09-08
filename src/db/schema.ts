@@ -8,7 +8,7 @@ import {
   varchar
 } from 'drizzle-orm/pg-core'
 
-export const role = pgEnum('role', ['admin', 'member', 'owner'])
+export const role = pgEnum('role', ['admin', 'manager', 'team'])
 
 export type Role = (typeof role.enumValues)[number]
 

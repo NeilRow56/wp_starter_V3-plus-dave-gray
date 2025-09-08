@@ -23,7 +23,7 @@ export default async function ProfilePage() {
     body: {
       userId: session.user.id,
       permissions: {
-        employees: ['create', 'read', 'update', 'delete']
+        project: ['create', 'read', 'update', 'delete']
       }
     }
   })
@@ -73,7 +73,7 @@ export default async function ProfilePage() {
             disabled={!FULL_POST_ACCESS.success}
             className='cursor-pointer'
           >
-            <Link href='/admin/employees'>Manage employees</Link>
+            <Link href='/admin/team'>Manage team members</Link>
           </Button>
         </div>
 

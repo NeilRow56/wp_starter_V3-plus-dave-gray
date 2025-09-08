@@ -44,13 +44,13 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       role: {
-        type: ['admin', 'member', 'owner'],
+        type: ['admin', 'manager', 'team'],
         input: false
       }
     }
   },
   session: {
-    expiresIn: 30 * 24 * 60 * 60, // 30 days - default is 7 days
+    expiresIn: 30 * 24 * 60 * 60 * 2, // 60 days - default is 7 days
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60
