@@ -30,6 +30,12 @@ export async function getAllCustomers() {
   return allCustomers
 }
 
+export async function getExistingCustomerEmails() {
+  const allCustomerEmails = await db.select().from(customers)
+
+  return allCustomerEmails
+}
+
 // export async function getCustomer(userId: string) {
 //   const customer = await db
 //     .select()
@@ -124,6 +130,12 @@ export const saveCustomerAction = actionClient
       })
 
       if (!session) redirect('/auth/sign-in')
+
+      // ERROR TESTS
+
+      // throw Error('test error customer create action')
+
+      // const data = await fetch('https://jsoplaceholder')
 
       // New Customer
       // All new customers are active by default - no need to set active to true

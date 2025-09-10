@@ -1,11 +1,13 @@
-import { relations, sql } from 'drizzle-orm'
+import { relations, SQL, sql } from 'drizzle-orm'
 import {
   pgTable,
   text,
   timestamp,
   boolean,
   pgEnum,
-  varchar
+  varchar,
+  AnyPgColumn,
+  uniqueIndex
 } from 'drizzle-orm/pg-core'
 
 export const role = pgEnum('role', ['admin', 'manager', 'team'])
@@ -75,27 +77,39 @@ export const verification = pgTable('verification', {
   )
 })
 
-export const customers = pgTable('customers', {
-  id: text('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  email: text('email').notNull().unique(),
-  firstName: text('first_name').notNull(),
-  lastName: text('last_name').notNull(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'restrict' }),
-  phone: varchar('phone').unique().notNull(),
-  address1: varchar('address1').notNull(),
-  address2: varchar('address2'),
-  city: varchar('city').notNull(),
-  state: varchar('state', { length: 2 }).notNull(),
-  zip: varchar('zip', { length: 10 }).notNull(),
-  notes: text('notes'),
-  active: boolean('active').notNull().default(true),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
-})
+export const customers = pgTable(
+  'customers',
+  {
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    email: text('email').unique().notNull(),
+    firstName: text('first_name').notNull(),
+    lastName: text('last_name').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'restrict' }),
+    phone: varchar('phone').unique().notNull(),
+    address1: varchar('address1').notNull(),
+    address2: varchar('address2'),
+    city: varchar('city').notNull(),
+    state: varchar('state', { length: 2 }).notNull(),
+    zip: varchar('zip', { length: 10 }).notNull(),
+    notes: text('notes'),
+    active: boolean('active').notNull().default(true),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow()
+  },
+  table => [
+    // uniqueIndex('emailUniqueIndex').on(sql`lower(${table.email})`),
+    uniqueIndex('emailUniqueIndex').on(lower(table.email))
+  ]
+)
+
+// custom lower function
+export function lower(email: AnyPgColumn): SQL {
+  return sql`lower(${email})`
+}
 
 export type Customer = typeof customers.$inferSelect
 

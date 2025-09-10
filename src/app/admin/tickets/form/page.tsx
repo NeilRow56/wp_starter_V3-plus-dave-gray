@@ -112,6 +112,7 @@ export default async function TicketFormPage({
     }
 
     // Edit ticket form
+
     if (ticketId) {
       const ticket = await getTicket(ticketId)
 

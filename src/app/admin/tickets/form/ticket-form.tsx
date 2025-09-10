@@ -8,18 +8,39 @@ import { Button } from '@/components/ui/button'
 import { InputWithLabel } from '@/components/form/input-with-label'
 import { CheckboxWithLabel } from '@/components/form/checkbox-with-label'
 import { TextAreaWithLabel } from '@/components/form/text-area-with-label'
-import z4 from 'zod/v4'
-import { ticketSchema } from '@/zod-schemas/tickets'
-import { Customer, Ticket } from '@/db/schema'
+
+import {
+  insertTicketSchema,
+  insertTicketSchemaType,
+  selectTicketSchemaType
+} from '@/zod-schemas/tickets'
+import { useAction } from 'next-safe-action/hooks'
+import { saveTicketAction } from '@/server/tickets'
+import { toast } from 'sonner'
+import { LoaderCircle } from 'lucide-react'
+import { selectCustomerSchemaType } from '@/zod-schemas/customers'
+import { DisplayServerActionResponse } from '@/components/display-server-action-response'
+import { SelectWithLabel } from '@/components/form/select-with-label'
 
 type Props = {
-  customer: Customer // You must have a customer to start a ticket , so it is not optional
-  ticket?: Ticket
+  customer: selectCustomerSchemaType
+  ticket?: selectTicketSchemaType
+
+  // techs array not completed. It will need adding to props in ticket form when used
+  techs?: {
+    id: string
+    description: string
+  }[]
+  isEditable?: boolean
 }
 
-type insertTicketSchemaType = z4.infer<typeof ticketSchema>
-
-export default function TicketForm({ customer, ticket }: Props) {
+export default function TicketForm({
+  customer,
+  ticket,
+  techs,
+  isEditable
+}: Props) {
+  const isManager = Array.isArray(techs)
   const defaultValues: insertTicketSchemaType = {
     id: ticket?.id ?? '(New)',
     customerId: ticket?.customerId ?? customer.id,
@@ -31,19 +52,42 @@ export default function TicketForm({ customer, ticket }: Props) {
 
   const form = useForm<insertTicketSchemaType>({
     mode: 'onBlur',
-    resolver: zodResolver(ticketSchema),
+    resolver: zodResolver(insertTicketSchema),
     defaultValues
   })
 
+  const {
+    execute: executeSave,
+    result: saveResult,
+    isPending: isSaving,
+    reset: resetSaveAction
+  } = useAction(saveTicketAction, {
+    onSuccess({ data }) {
+      if (data?.message) {
+        toast.success(`Ticket ${ticket ? 'updated ' : 'added'} successfully`)
+      }
+    },
+    onError({ error }) {
+      console.log(error)
+      toast.error(`Failed to ${ticket ? 'update' : 'add'} ticket`)
+    }
+  })
+
   async function submitForm(data: insertTicketSchemaType) {
-    console.log(data)
+    executeSave(data)
   }
 
   return (
     <div className='flex flex-col gap-1 sm:px-8'>
+      <DisplayServerActionResponse result={saveResult} />
       <div>
         <h2 className='text-2xl font-bold'>
-          {ticket?.id ? `Edit Ticket # ${ticket.id}` : 'New Ticket Form'}
+          {/* {ticket?.id ? `Edit Ticket # ${ticket.id}` : 'New Ticket Form'} */}
+          {ticket?.id && isEditable
+            ? `Edit Ticket # ${ticket.id}`
+            : ticket?.id
+              ? `View Ticket # ${ticket.id}`
+              : 'New Ticket Form'}
         </h2>
       </div>
       <Form {...form}>
@@ -55,19 +99,36 @@ export default function TicketForm({ customer, ticket }: Props) {
             <InputWithLabel<insertTicketSchemaType>
               fieldTitle='Title'
               nameInSchema='title'
+              disabled={isEditable}
             />
+            {isManager ? (
+              <SelectWithLabel<insertTicketSchemaType>
+                fieldTitle='Tech ID'
+                nameInSchema='tech'
+                data={[
+                  {
+                    id: 'new-ticket@example.com',
+                    description: 'new-ticket@example.com'
+                  },
+                  ...techs
+                ]}
+              />
+            ) : (
+              <InputWithLabel<insertTicketSchemaType>
+                fieldTitle='Tech'
+                nameInSchema='tech'
+                disabled={true}
+              />
+            )}
 
-            <InputWithLabel<insertTicketSchemaType>
-              fieldTitle='Tech'
-              nameInSchema='tech'
-              disabled={true}
-            />
-
-            <CheckboxWithLabel<insertTicketSchemaType>
-              fieldTitle='Completed'
-              nameInSchema='completed'
-              message='Yes'
-            />
+            {ticket?.id ? (
+              <CheckboxWithLabel<insertTicketSchemaType>
+                fieldTitle='Completed'
+                nameInSchema='completed'
+                message='Yes'
+                // disabled={!isEditable}
+              />
+            ) : null}
 
             <div className='mt-4 space-y-2'>
               <h3 className='text-lg'>Customer Info</h3>
@@ -93,25 +154,37 @@ export default function TicketForm({ customer, ticket }: Props) {
               className='h-96'
             />
 
-            <div className='flex gap-2'>
-              <Button
-                type='submit'
-                className='w-3/4'
-                variant='default'
-                title='Save'
-              >
-                Save
-              </Button>
+            {!isEditable ? (
+              <div className='flex gap-2'>
+                <Button
+                  type='submit'
+                  className='w-3/4'
+                  variant='default'
+                  title='Save'
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <LoaderCircle className='animate-spin' /> Saving
+                    </>
+                  ) : (
+                    'Save'
+                  )}
+                </Button>
 
-              <Button
-                type='button'
-                variant='destructive'
-                title='Reset'
-                onClick={() => form.reset(defaultValues)}
-              >
-                Reset
-              </Button>
-            </div>
+                <Button
+                  type='button'
+                  variant='destructive'
+                  title='Reset'
+                  onClick={() => {
+                    form.reset(defaultValues)
+                    resetSaveAction()
+                  }}
+                >
+                  Reset
+                </Button>
+              </div>
+            ) : null}
           </div>
         </form>
       </Form>
