@@ -80,6 +80,8 @@ export default async function CustomerTwoFormPage({
 
       // return customer form
       if (userId && !customerId) {
+        console.log(user)
+
         return <CustomerForm user={user} />
       }
     }

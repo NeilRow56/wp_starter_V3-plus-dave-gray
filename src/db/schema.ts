@@ -106,7 +106,7 @@ export const tickets = pgTable('tickets', {
     .default(sql`gen_random_uuid()`),
   customerId: text('customer_id')
     .notNull()
-    .references(() => customers.id),
+    .references(() => customers.id, { onDelete: 'restrict' }),
   title: varchar('title').notNull(),
   description: text('description'),
   completed: boolean('completed').notNull().default(false),
