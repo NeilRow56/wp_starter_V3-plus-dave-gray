@@ -45,6 +45,12 @@ export async function getExistingCustomerEmails() {
 //   return customer[0]
 // }
 
+export async function emailAlreadyExists(email: string) {
+  return db.query.customers.findFirst({
+    where: eq(customers.email, email)
+  })
+}
+
 export async function getCustomerById(id: string, userId: string) {
   return db.query.customers.findFirst({
     where: and(eq(customers.id, id), eq(customers.userId, userId))
@@ -133,9 +139,11 @@ export const saveCustomerAction = actionClient
 
       // ERROR TESTS
 
-      // throw Error('test error customer create action')
+      const existingEmail = await emailAlreadyExists(customer.email)
 
-      // const data = await fetch('https://jsoplaceholder')
+      if (existingEmail) {
+        throw Error('email already exists. Please choose another email')
+      }
 
       // New Customer
       // All new customers are active by default - no need to set active to true
